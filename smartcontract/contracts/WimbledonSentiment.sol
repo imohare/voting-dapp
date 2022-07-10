@@ -31,11 +31,35 @@ event tickerupdated {
 mapping(string => ticker) private Tickers;
 
 /// add tickers only callable by owner of contract
-function addTicker(string memoru _ticker) public {
+function addTicker(string memory _ticker) public {
   require(msg.sender == owner, "Only owner can create ticker");
   ticker storage newTicker = Ticker(_ticker);
   newTicker.exists = true; 
   tickersArray.push(_ticker);
+}
+
+/// check: voting state + set: voting state & vote + call emit tickerupdated
+function vote(string memory _ticker, bool _vote) public {
+  require(Tickers[_ticker].exists, "Can't vote for this player");
+  require(!Tickers[_ticker].Voters[msg.sender], "You've already voted for this plater");
+  ticker storage t = Tickers(_ticker);
+  t.Voters[msg.sender] = true; 
+  if(_vote) {
+    t.up++;
+  } else {
+    t.down++;
+  }
+  emit tickerupdated(t.up, t.down, msg.sender, _ticker);
+}
+
+/// allow public to get votes 
+function getVotes(string memory _ticker) public view returns (
+  uint256 up, 
+  uint256 down
+) {
+  require(Tickers[_ticker].exists, "This ticker doesn't exist");
+  ticker storage t = Tickers[_ticker];
+  return(t.up, t.down);
 }
 
 }
