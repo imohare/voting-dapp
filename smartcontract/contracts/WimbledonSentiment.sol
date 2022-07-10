@@ -17,15 +17,15 @@ struct ticker {
   uint256 up; 
   uint256 down; 
   mapping(address => bool) Voters; 
-};
+}
 
 /// for moralis to listen to the smartcontract
-event tickerupdated {
+event tickerupdated(
   uint256 up, 
   uint256 down, 
   address voter,
   string ticker
-};
+);
 
 /// takes string and maps it to ticker struct
 mapping(string => ticker) private Tickers;
@@ -33,7 +33,7 @@ mapping(string => ticker) private Tickers;
 /// add tickers only callable by owner of contract
 function addTicker(string memory _ticker) public {
   require(msg.sender == owner, "Only owner can create ticker");
-  ticker storage newTicker = Ticker(_ticker);
+  ticker storage newTicker = Tickers[_ticker];
   newTicker.exists = true; 
   tickersArray.push(_ticker);
 }
@@ -42,7 +42,7 @@ function addTicker(string memory _ticker) public {
 function vote(string memory _ticker, bool _vote) public {
   require(Tickers[_ticker].exists, "Can't vote for this player");
   require(!Tickers[_ticker].Voters[msg.sender], "You've already voted for this plater");
-  ticker storage t = Tickers(_ticker);
+  ticker storage t = Tickers[_ticker];
   t.Voters[msg.sender] = true; 
   if(_vote) {
     t.up++;
