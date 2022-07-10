@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.7;
 
-contract wimbledonsentiment {
+contract WimbledonSentiment {
   address public owner; 
   string[] public tickersArray;
 
